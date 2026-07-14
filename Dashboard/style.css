@@ -387,4 +387,17 @@ form button[type="submit"]:hover {
         padding: 20px;
         margin: 10% auto;
     }
+
+    /* 7. Agregar Scroll vertical a las tablas en celular */
+    .table-container {
+        max-height: 300px; /* Puedes bajar este número si la quieres más corta */
+        overflow-y: auto;
+    }
+
+    /* 8. Limitar la altura del panel de la gráfica */
+    .chart-section {
+        height: 280px; /* Forzamos a que el cuadro sea más pequeño */
+        position: relative; /* Vital para que Chart.js respete la altura */
+        padding-bottom: 10px;
+    }
 }

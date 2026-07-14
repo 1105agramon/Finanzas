@@ -47,9 +47,12 @@
 
         <div class="main-grid">
             <!-- Zona 2: La Gráfica -->
-            <section class="chart-section panel">
+            <section class="panel">
                 <h2>Comportamiento de Gastos</h2>
-                <canvas id="graficaFinanzas"></canvas>
+                <!-- Envolvemos SOLO el canvas en el contenedor de altura controlada -->
+                <div class="chart-section">
+                    <canvas id="graficaFinanzas"></canvas>
+                </div>
             </section>
 
             <!-- Zona 3: Recordatorios de MSI -->

@@ -65,19 +65,32 @@ async function cargarDatosDashboard() {
         }
         // ==========================================
 
-        // 5. Cálculos Matemáticos para los Widgets
+        // 5. Cálculos Matemáticos para los Widgets y Gráfica
         
-        // Sumar todos los ingresos
-        let totalIngresos = ingresos.reduce((acc, current) => acc + current.salarioQuincenal, 0);
-        
-        // Sumar todos los gastos
-        let totalGastos = gastos.reduce((acc, current) => acc + current.montoTotal, 0);
-        
-        // Actualizar el HTML de los widgets
+        let totalIngresos = 0;
+        let totalGastos = 0;
+
+        if (ingresos.length > 0) {
+            // Tomamos el ingreso más reciente (suponiendo que es el primero)
+            const ultimaQuincena = ingresos[0];
+            totalIngresos = ultimaQuincena.salarioQuincenal;
+
+            // Filtramos SOLO los gastos que se hicieron desde esa fecha en adelante
+            const fechaCorte = new Date(ultimaQuincena.fechaDeposito + 'T00:00:00');
+            
+            const gastosRecientes = gastos.filter(gasto => {
+                const fechaGasto = new Date(gasto.fechaCompra + 'T00:00:00');
+                return fechaGasto >= fechaCorte; // ¿El gasto es igual o posterior a mi quincena?
+            });
+
+            // Sumamos solo los gastos de la quincena actual
+            totalGastos = gastosRecientes.reduce((acc, current) => acc + current.montoTotal, 0);
+        }
+
+        // Actualizar el HTML de los widgets (El historial seguirá mostrando todo, pero el widget solo lo de hoy)
         document.getElementById('widget-salario').textContent = formatearMoneda(totalIngresos);
         document.getElementById('widget-gastado').textContent = formatearMoneda(totalGastos);
         document.getElementById('widget-tarjetas').textContent = tarjetas.length;
-
         // 6. Generar la Gráfica
         dibujarGrafica(totalIngresos, totalGastos);
 
@@ -91,6 +104,7 @@ async function cargarDatosDashboard() {
         console.error("Error al cargar los datos del dashboard:", error);
     }
 }
+
 
 // 8. Lógica de la Gráfica (Chart.js)
 function dibujarGrafica(ingreso, gasto) {
@@ -109,19 +123,22 @@ function dibujarGrafica(ingreso, gasto) {
                 {
                     label: 'Ingresos',
                     data: [ingreso],
-                    backgroundColor: '#10b981', // Verde actualizado
-                    borderRadius: 5
+                    backgroundColor: '#10b981', 
+                    borderRadius: 5,
+                    maxBarThickness: 45 // <-- NUEVO: Evita que las barras se hagan gordas
                 },
                 {
                     label: 'Gastos',
                     data: [gasto],
-                    backgroundColor: '#ef4444', // Rojo actualizado
-                    borderRadius: 5
+                    backgroundColor: '#ef4444', 
+                    borderRadius: 5,
+                    maxBarThickness: 45 // <-- NUEVO: Evita que las barras se hagan gordas
                 }
             ]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false, // <-- NUEVO: Obliga a la gráfica a obedecer la altura de 280px del CSS
             scales: {
                 y: {
                     beginAtZero: true
