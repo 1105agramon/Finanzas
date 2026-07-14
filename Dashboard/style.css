@@ -165,6 +165,12 @@ button {
     border-radius: 12px;
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
     border: 1px solid var(--border-color);
+    
+    /* Evita que la caja se desborde a los lados en pantallas pequeñas */
+    min-width: 0; 
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .panel h2 {
@@ -179,6 +185,7 @@ button {
    TABLA DE MSI
 ========================================= */
 .table-container {
+    width: 100%; /* Asegura que no sobrepase a su contenedor padre */
     overflow-x: auto;
 }
 
