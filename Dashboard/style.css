@@ -2,16 +2,16 @@
    VARIABLES GLOBALES (LA PALETA DE COLORES)
 ========================================= */
 :root {
-    --bg-color: #f4f7f9;         /* Gris azulado muy claro para el fondo */
-    --card-bg: #ffffff;          /* Blanco puro para las tarjetas */
-    --primary-color: #1e293b;    /* Azul pizarra oscuro para textos principales */
-    --accent-color: #3b82f6;     /* Azul vibrante para botones primarios */
-    --accent-hover: #2563eb;     /* Azul más oscuro para el hover */
-    --success-color: #10b981;    /* Verde esmeralda para ingresos */
-    --error-color: #ef4444;      /* Rojo coral para gastos y botones secundarios */
-    --error-hover: #dc2626;      /* Rojo oscuro para el hover */
-    --text-muted: #64748b;       /* Gris para textos secundarios */
-    --border-color: #e2e8f0;     /* Gris súper claro para divisiones */
+    --bg-color: #121418;         /* Fondo oscuro profundo */
+    --card-bg: #1e2128;          /* Gris oscuro ligeramente más claro para tarjetas */
+    --primary-color: #f8f9fa;    /* Blanco humo para textos principales */
+    --accent-color: #a2d2ff;     /* Azul pastel para botones primarios y acentos */
+    --accent-hover: #bde0fe;     /* Azul pastel más claro para el hover */
+    --success-color: #b7e4c7;    /* Verde pastel para ingresos o acciones positivas */
+    --error-color: #ffb4a2;      /* Rosado/coral pastel para gastos y botones secundarios */
+    --error-hover: #ffcadd;      /* Tono pastel alternativo para el hover de error */
+    --text-muted: #aeb8c4;       /* Gris claro/azulado para textos secundarios */
+    --border-color: #323642;     /* Gris oscuro para divisiones sutiles */
 }
 
 /* =========================================
@@ -40,7 +40,7 @@
     background: var(--card-bg);
     padding: 20px 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
     margin-bottom: 20px;
 }
 
@@ -68,10 +68,10 @@ button {
     border: none;
     border-radius: 8px;
     font-size: 0.95em;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: white;
+    color: #121418; /* Texto oscuro para contrastar con los fondos pasteles */
 }
 
 .btn-primario {
@@ -90,7 +90,7 @@ button {
 }
 
 .btn-accion:hover {
-    background-color: #059669;
+    background-color: #95d5b2; /* Verde pastel un poco más intenso */
     transform: translateY(-1px);
 }
 
@@ -117,7 +117,7 @@ button {
     background: var(--card-bg);
     padding: 25px;
     border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
     text-align: center;
     border: 1px solid var(--border-color);
 }
@@ -163,10 +163,9 @@ button {
     background: var(--card-bg);
     padding: 25px;
     border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
     border: 1px solid var(--border-color);
     
-    /* Evita que la caja se desborde a los lados en pantallas pequeñas */
     min-width: 0; 
     width: 100%;
     max-width: 100%;
@@ -185,7 +184,7 @@ button {
    TABLA DE MSI
 ========================================= */
 .table-container {
-    width: 100%; /* Asegura que no sobrepase a su contenedor padre */
+    width: 100%; 
     overflow-x: auto;
 }
 
@@ -199,10 +198,11 @@ th, td {
     text-align: left;
     border-bottom: 1px solid var(--border-color);
     font-size: 0.95em;
+    color: var(--primary-color);
 }
 
 th {
-    background-color: #f8fafc;
+    background-color: #252830; /* Tono de fondo oscuro para las cabeceras */
     color: var(--text-muted);
     font-weight: 600;
     text-transform: uppercase;
@@ -211,12 +211,12 @@ th {
 }
 
 tr:hover {
-    background-color: #f1f5f9;
+    background-color: #2a2d36; /* Hover oscuro sutil */
 }
 
 .badge-pendiente {
-    background-color: #f59e0b;
-    color: #fff;
+    background-color: #fcf6bd; /* Amarillo pastel */
+    color: #121418; /* Texto oscuro para legibilidad */
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 0.75em;
@@ -235,7 +235,7 @@ tr:hover {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(15, 23, 42, 0.6); 
+    background-color: rgba(0, 0, 0, 0.75); /* Fondo modal más oscuro */
     backdrop-filter: blur(4px);
 }
 
@@ -246,7 +246,7 @@ tr:hover {
     border-radius: 16px;
     width: 90%;
     max-width: 450px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
     position: relative;
     animation: fadeIn 0.3s ease;
 }
@@ -299,7 +299,7 @@ tr:hover {
     border-radius: 8px;
     font-size: 1em;
     color: var(--primary-color);
-    background-color: #f8fafc;
+    background-color: var(--bg-color); /* Fondo oscuro para los inputs */
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 
@@ -307,8 +307,8 @@ tr:hover {
 .input-group select:focus {
     outline: none;
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(162, 210, 255, 0.15); /* Sombra color pastel */
+    background-color: var(--card-bg);
 }
 
 /* Ajuste del botón dentro de los modales */
@@ -324,12 +324,10 @@ form button[type="submit"]:hover {
     background-color: var(--accent-hover);
 }
 
-
 /* =========================================
    RESPONSIVIDAD PARA CELULARES (MOBILE)
 ========================================= */
 @media (max-width: 768px) {
-    /* 1. Reducir los espacios en blanco para aprovechar la pantalla pequeña */
     .dashboard-body {
         padding: 15px;
     }
@@ -342,7 +340,6 @@ form button[type="submit"]:hover {
         padding: 15px;
     }
 
-    /* 2. Apilar el encabezado verticalmente y centrarlo */
     .dashboard-header {
         flex-direction: column;
         text-align: center;
@@ -350,7 +347,6 @@ form button[type="submit"]:hover {
         padding: 15px;
     }
 
-    /* 3. Hacer que los botones de acción ocupen el 100% del ancho */
     .acciones-bar {
         flex-direction: column;
         gap: 10px;
@@ -361,19 +357,16 @@ form button[type="submit"]:hover {
         padding: 15px;
     }
 
-    /* 4. Reducir ligeramente la tipografía de los montos grandes */
     .monto {
         font-size: 1.8em;
     }
 
-    /* 5. Ajustes clave para las Tablas */
     th, td {
         padding: 10px;
         font-size: 0.85em;
-        white-space: nowrap; /* Evita que el texto se rompa en varias líneas hacia abajo */
+        white-space: nowrap; 
     }
 
-    /* Ajuste para el botón de "Pagar Mes" dentro de la tabla MSI */
     td button {
         padding: 8px !important;
         font-size: 0.85em !important;
@@ -381,30 +374,26 @@ form button[type="submit"]:hover {
         margin-top: 5px;
     }
     
-    /* Cambiamos la celda de pago a columna para que el botón no empuje la fecha */
     td[style*="justify-content: space-between"] {
         flex-direction: column !important;
         align-items: flex-start !important;
         gap: 10px;
     }
     
-    /* 6. Ajustes para los Modales */
     .modal-content {
         width: 95%;
         padding: 20px;
         margin: 10% auto;
     }
 
-    /* 7. Agregar Scroll vertical a las tablas en celular */
     .table-container {
-        max-height: 300px; /* Puedes bajar este número si la quieres más corta */
+        max-height: 300px; 
         overflow-y: auto;
     }
 
-    /* 8. Limitar la altura del panel de la gráfica */
     .chart-section {
-        height: 280px; /* Forzamos a que el cuadro sea más pequeño */
-        position: relative; /* Vital para que Chart.js respete la altura */
+        height: 280px; 
+        position: relative; 
         padding-bottom: 10px;
     }
 }
