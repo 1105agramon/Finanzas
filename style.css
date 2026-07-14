@@ -98,3 +98,23 @@ button:hover {
     margin-top: 15px;
     font-size: 0.9em;
 }
+
+/* =========================================
+   RESPONSIVIDAD PARA CELULARES (MOBILE)
+========================================= */
+@media (max-width: 480px) {
+    .login-body {
+        /* Agregamos padding al body para que la caja blanca jamás toque los bordes del teléfono */
+        padding: 20px; 
+    }
+
+    .login-container {
+        /* Reducimos un poco el relleno interno para que los inputs tengan más espacio */
+        padding: 30px 20px; 
+        border-radius: 12px; /* Un borde un poco más suave en móvil */
+    }
+
+    .login-container h2 {
+        font-size: 1.5em; /* Ajustamos el título ligeramente */
+    }
+}
