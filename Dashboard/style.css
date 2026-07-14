@@ -316,3 +316,75 @@ form button[type="submit"] {
 form button[type="submit"]:hover {
     background-color: var(--accent-hover);
 }
+
+
+/* =========================================
+   RESPONSIVIDAD PARA CELULARES (MOBILE)
+========================================= */
+@media (max-width: 768px) {
+    /* 1. Reducir los espacios en blanco para aprovechar la pantalla pequeña */
+    .dashboard-body {
+        padding: 15px;
+    }
+
+    .panel {
+        padding: 15px;
+    }
+
+    .widget {
+        padding: 15px;
+    }
+
+    /* 2. Apilar el encabezado verticalmente y centrarlo */
+    .dashboard-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    /* 3. Hacer que los botones de acción ocupen el 100% del ancho */
+    .acciones-bar {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .acciones-bar button {
+        width: 100%;
+        padding: 15px;
+    }
+
+    /* 4. Reducir ligeramente la tipografía de los montos grandes */
+    .monto {
+        font-size: 1.8em;
+    }
+
+    /* 5. Ajustes clave para las Tablas */
+    th, td {
+        padding: 10px;
+        font-size: 0.85em;
+        white-space: nowrap; /* Evita que el texto se rompa en varias líneas hacia abajo */
+    }
+
+    /* Ajuste para el botón de "Pagar Mes" dentro de la tabla MSI */
+    td button {
+        padding: 8px !important;
+        font-size: 0.85em !important;
+        width: auto;
+        margin-top: 5px;
+    }
+    
+    /* Cambiamos la celda de pago a columna para que el botón no empuje la fecha */
+    td[style*="justify-content: space-between"] {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px;
+    }
+    
+    /* 6. Ajustes para los Modales */
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+        margin: 10% auto;
+    }
+}
