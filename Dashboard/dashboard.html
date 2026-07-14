@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Mis Finanzas</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Importamos Chart.js para la gráfica -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-body">
+
+    <!-- Header / Barra de Navegación -->
+    <header class="dashboard-header">
+        <div class="header-info">
+            <h1 id="bienvenida-usuario">Cargando...</h1>
+            <p>Resumen de tu quincena</p>
+        </div>
+        <button id="btn-logout" class="btn-secundario">Cerrar Sesión</button>
+    </header>
+
+    <!-- Barra de Acciones -->
+    <div class="acciones-bar">
+        <button id="btn-nueva-quincena" class="btn-primario">+ Ingresar Quincena</button>
+        <button id="btn-nueva-tarjeta" class="btn-primario">+ Agregar Tarjeta</button>
+        <button id="btn-nuevo-gasto" class="btn-accion">+ Registrar Gasto</button>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <main class="dashboard-container">
+        
+        <!-- Zona 1: Widgets de Resumen -->
+        <section class="widgets-grid">
+            <div class="widget">
+                <h3>Salario de la Quincena</h3>
+                <p id="widget-salario" class="monto">$0.00</p>
+            </div>
+            <div class="widget">
+                <h3>Total Gastado</h3>
+                <p id="widget-gastado" class="monto gasto">$0.00</p>
+            </div>
+            <div class="widget">
+                <h3>Tarjetas Activas</h3>
+                <p id="widget-tarjetas" class="monto neutro">0</p>
+            </div>
+        </section>
+
+        <div class="main-grid">
+            <!-- Zona 2: La Gráfica -->
+            <section class="chart-section panel">
+                <h2>Comportamiento de Gastos</h2>
+                <canvas id="graficaFinanzas"></canvas>
+            </section>
+
+            <!-- Zona 3: Recordatorios de MSI -->
+            <section class="msi-section panel">
+                <h2>Recordatorios Pendientes (MSI)</h2>
+                <div class="table-container">
+                    <table id="tabla-msi">
+                        <thead>
+                            <tr>
+                                <th>Concepto</th>
+                                <th>Mensualidad</th>
+                                <th>Monto</th>
+                                <th>Vencimiento</th>
+                            </tr>
+                        </thead>
+                        <tbody id="msi-body">
+                            <!-- Aquí se inyectarán los datos desde JavaScript -->
+                            <tr><td colspan="4" style="text-align: center;">Cargando pendientes...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Zona 4: Historial Completo de Gastos -->
+        <section class="historial-section panel" style="margin-top: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; padding-bottom: 15px;">
+                <h2 style="border: none; margin: 0; padding: 0;">Historial de Gastos</h2>
+                
+                <!-- Filtro Dinámico -->
+                <div>
+                    <label for="filtro-categoria" style="font-size: 0.9em; font-weight: 600; color: var(--text-muted); margin-right: 10px;">Filtrar por Categoría:</label>
+                    <select id="filtro-categoria" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); outline: none;">
+                        <option value="TODAS">Todas las categorías</option>
+                        <option value="Comida">Comida / Despensa</option>
+                        <option value="Transporte">Transporte</option>
+                        <option value="Servicios">Servicios</option>
+                        <option value="Entretenimiento">Entretenimiento</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                <table id="tabla-historial">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Concepto</th>
+                            <th>Categoría</th>
+                            <th>Método de Pago</th>
+                            <th>Tipo</th>
+                            <th>Monto Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historial-body">
+                        <tr><td colspan="6" style="text-align: center;">Cargando historial...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= MODALES ================= -->
+    
+    <!-- Modal: Agregar Quincena -->
+    <div id="modal-quincena" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-quincena">&times;</span>
+            <h2>Registrar Quincena</h2>
+            <form id="form-quincena">
+                <div class="input-group">
+                    <label>Salario Quincenal</label>
+                    <input type="number" step="0.01" id="monto-quincena" required placeholder="Ej. 5000.00">
+                </div>
+                <div class="input-group">
+                    <label>Fecha de Depósito</label>
+                    <input type="date" id="fecha-quincena" required>
+                </div>
+                <button type="submit">Guardar Ingreso</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Agregar Tarjeta -->
+    <div id="modal-tarjeta" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-tarjeta">&times;</span>
+            <h2>Agregar Tarjeta</h2>
+            <form id="form-tarjeta">
+                <div class="input-group">
+                    <label>Alias (Ej. Santander Nómina)</label>
+                    <input type="text" id="alias-tarjeta" required>
+                </div>
+                <div class="input-group">
+                    <label>Tipo</label>
+                    <select id="tipo-tarjeta" required>
+                        <option value="DEBITO">Débito</option>
+                        <option value="CREDITO">Crédito</option>
+                    </select>
+                </div>
+                <!-- Estos campos solo importan si es de crédito, pero los dejamos opcionales -->
+                <div class="input-group">
+                    <label>Día de Corte (Solo crédito)</label>
+                    <input type="number" id="dia-corte" min="1" max="31">
+                </div>
+                <div class="input-group">
+                    <label>Día Límite de Pago (Solo crédito)</label>
+                    <input type="number" id="dia-limite-pago" min="1" max="31">
+                </div>
+                <button type="submit">Guardar Tarjeta</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Registrar Gasto -->
+    <div id="modal-gasto" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-gasto">&times;</span>
+            <h2>Registrar Nuevo Gasto</h2>
+            <form id="form-gasto">
+                <div class="input-group">
+                    <label>Concepto (¿Qué compraste?)</label>
+                    <input type="text" id="concepto-gasto" required placeholder="Ej. Despensa, Netflix, etc.">
+                </div>
+                <div class="input-group">
+                    <label>Monto Total</label>
+                    <input type="number" step="0.01" id="monto-gasto" required>
+                </div>
+                <div class="input-group">
+                    <label>Categoría</label>
+                    <select id="categoria-gasto" required>
+                        <option value="Comida">Comida / Despensa</option>
+                        <option value="Transporte">Transporte</option>
+                        <option value="Servicios">Servicios (Luz, Internet)</option>
+                        <option value="Entretenimiento">Entretenimiento</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>¿Con qué tarjeta pagaste?</label>
+                    <select id="tarjeta-gasto" required>
+                        <!-- Se llenará desde JS con tus tarjetas -->
+                    </select>
+                </div>
+                <div class="input-group" style="display: flex; align-items: center; gap: 10px; margin-top: 15px;">
+                    <input type="checkbox" id="es-msi" style="width: auto;">
+                    <label style="margin: 0;">¿Es a Meses Sin Intereses?</label>
+                </div>
+                <div class="input-group" id="div-meses" style="display: none;">
+                    <label>¿A cuántos meses?</label>
+                    <input type="number" id="meses-totales" min="2" max="48" value="3">
+                </div>
+                <button type="submit" style="margin-top: 15px;">Guardar Gasto</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

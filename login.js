@@ -32,13 +32,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             
             // 1. Guardamos los datos del usuario en el navegador
             localStorage.setItem('usuarioLogueado', JSON.stringify(usuario));
-            
-            // 2. 🛑 EL MENSAJE DE CONFIRMACIÓN 🛑
-            // Usamos las comillas invertidas (backticks) para poder inyectar las variables
-            alert(`¡Acceso concedido!\n\nUsuario: ${usuario.nombre}\nCorreo: ${usuario.correo}`);
-            
-            // 3. Redirigimos al panel principal SOLAMENTE después de que el usuario cierre la alerta
-            window.location.href = 'dashboard.html';
+            window.location.href = 'Dashboard/dashboard.html';
             
         } else {
             // Contraseña incorrecta o usuario no encontrado
