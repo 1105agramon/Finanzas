@@ -1,9 +1,12 @@
 :root {
-    --primary-color: #2c3e50;
-    --accent-color: #3498db;
-    --bg-color: #f4f7f6;
-    --text-color: #333;
-    --error-color: #e74c3c;
+    --primary-color: #f8f9fa;    /* Blanco humo para textos */
+    --accent-color: #a2d2ff;     /* Azul pastel */
+    --accent-hover: #bde0fe;     /* Azul pastel claro */
+    --bg-color: #121418;         /* Fondo oscuro profundo */
+    --card-bg: #1e2128;          /* Gris oscuro para el contenedor */
+    --text-color: #aeb8c4;       /* Gris azulado para textos secundarios */
+    --error-color: #ffb4a2;      /* Coral pastel para errores */
+    --border-color: #323642;     /* Bordes sutiles */
 }
 
 * {
@@ -13,9 +16,13 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Estilos específicos para la pantalla de Login */
+/* =========================================
+   PANTALLA DE LOGIN Y ANIMACIÓN BASE
+========================================= */
 .login-body {
     background-color: var(--bg-color);
+    /* Le agregamos un sutil gradiente radial para darle profundidad al fondo */
+    background-image: radial-gradient(circle at top center, #1e2128, transparent);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,13 +30,26 @@
 }
 
 .login-container {
-    background: white;
+    background: var(--card-bg);
     padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 16px; /* Bordes un poco más redondeados y modernos */
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
     width: 100%;
     max-width: 400px;
     text-align: center;
+    border: 1px solid var(--border-color);
+    
+    /* Animación principal de entrada */
+    opacity: 0;
+    transform: translateY(30px);
+    animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpFade {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .login-container h2 {
@@ -38,53 +58,88 @@
 }
 
 .login-container p {
-    color: #7f8c8d;
+    color: var(--text-color);
     margin-bottom: 30px;
     font-size: 0.9em;
 }
 
+/* =========================================
+   INPUTS Y ANIMACIÓN EN CASCADA
+========================================= */
 .input-group {
     margin-bottom: 20px;
     text-align: left;
+    
+    /* Preparación para animación en cascada */
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Retraso escalonado para que aparezcan uno por uno */
+.input-group:nth-of-type(1) { animation-delay: 0.15s; }
+.input-group:nth-of-type(2) { animation-delay: 0.3s; }
+
+@keyframes fadeIn {
+    to { opacity: 1; }
 }
 
 .input-group label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     color: var(--primary-color);
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 0.9em;
 }
 
 .input-group input {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 12px;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     outline: none;
-    transition: border-color 0.3s;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
 }
 
 .input-group input:focus {
     border-color: var(--accent-color);
+    /* Brillo exterior pastel al hacer focus */
+    box-shadow: 0 0 0 3px rgba(162, 210, 255, 0.15);
+    background-color: var(--card-bg);
 }
 
+/* =========================================
+   BOTÓN
+========================================= */
 button {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     background-color: var(--accent-color);
-    color: white;
+    color: #121418; /* Texto oscuro para contraste */
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     font-size: 1em;
     cursor: pointer;
     font-weight: bold;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    
+    /* El botón aparece al final */
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+    animation-delay: 0.45s;
 }
 
 button:hover {
-    background-color: #2980b9;
+    background-color: var(--accent-hover);
+    transform: translateY(-2px); /* Se levanta un poco */
+    box-shadow: 0 5px 15px rgba(162, 210, 255, 0.25); /* Sombra brillante */
 }
 
+/* =========================================
+   MENSAJES DE ERROR Y ANIMACIÓN SHAKE
+========================================= */
 .error-oculto {
     display: none;
     color: var(--error-color);
@@ -97,6 +152,15 @@ button:hover {
     color: var(--error-color);
     margin-top: 15px;
     font-size: 0.9em;
+    /* Efecto de vibración cuando sale el error */
+    animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
 }
 
 /* =========================================
@@ -104,17 +168,15 @@ button:hover {
 ========================================= */
 @media (max-width: 480px) {
     .login-body {
-        /* Agregamos padding al body para que la caja blanca jamás toque los bordes del teléfono */
         padding: 20px; 
     }
 
     .login-container {
-        /* Reducimos un poco el relleno interno para que los inputs tengan más espacio */
         padding: 30px 20px; 
-        border-radius: 12px; /* Un borde un poco más suave en móvil */
+        border-radius: 12px; 
     }
 
     .login-container h2 {
-        font-size: 1.5em; /* Ajustamos el título ligeramente */
+        font-size: 1.5em; 
     }
 }
