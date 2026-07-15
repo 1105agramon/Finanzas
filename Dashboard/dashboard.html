@@ -81,6 +81,10 @@
         <section class="historial-section panel" style="margin-top: 25px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; padding-bottom: 15px;">
                 <h2 style="border: none; margin: 0; padding: 0;">Historial de Gastos</h2>
+                <button onclick="window.location.href='historial.html'" class="btn-primario" style="padding: 8px 15px; font-size: 0.85em;">
+                        📊 Ver Historial Completo
+                </button>
+                
                 
                 <!-- Filtro Dinámico -->
                 <div>
@@ -95,6 +99,7 @@
                     </select>
                 </div>
             </div>
+            
 
             <div class="table-container" style="max-height: 400px; overflow-y: auto;">
                 <table id="tabla-historial">

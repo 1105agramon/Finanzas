@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial Anual de Gastos</title>
+    <!-- Vinculamos tu mismo CSS mágico -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Evitamos el error del favicon -->
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    <!-- Chart.js para la gráfica -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-body">
+
+    <!-- Encabezado con botón para regresar -->
+    <header class="dashboard-header">
+        <div class="header-info">
+            <h1>Análisis Histórico de Gastos</h1>
+            <p>Visualiza y filtra tus gastos por año y mes</p>
+        </div>
+        <div class="acciones-bar" style="margin-bottom: 0;">
+            <button onclick="window.location.href='dashboard.html'" class="btn-secundario">← Volver al Dashboard</button>
+        </div>
+    </header>
+
+    <!-- Controles de Filtro y Resumen -->
+    <div class="widgets-grid">
+        <div class="widget">
+            <h3>Selecciona un Año</h3>
+            <div class="input-group" style="margin-bottom: 0;">
+                <select id="filtro-anio" style="font-size: 1.2em; text-align: center;">
+                    <option value="">Cargando años...</option>
+                </select>
+            </div>
+        </div>
+        <div class="widget">
+            <h3>Total Gastado en el Año</h3>
+            <p id="total-anio" class="monto gasto">$0.00</p>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <!-- Tabla de todos los gastos del año -->
+        <section class="panel">
+            <h2>Detalle de Gastos</h2>
+            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                <table id="tabla-historial">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Concepto</th>
+                            <th>Categoría</th>
+                            <th>Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historial-completo-body">
+                        <tr><td colspan="4" style="text-align: center;">Cargando historial...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Gráfica de barras por meses -->
+        <section class="panel">
+            <h2>Comportamiento Mensual</h2>
+            <div class="chart-section" style="height: 400px; position: relative;">
+                <canvas id="graficaAnual"></canvas>
+            </div>
+        </section>
+    </div>
+
+    <!-- Script dedicado para esta página -->
+    <script src="historial.js"></script>
+</body>
+</html>
