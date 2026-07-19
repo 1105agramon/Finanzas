@@ -79,27 +79,29 @@
 
         <!-- Zona 4: Historial Completo de Gastos -->
         <section class="historial-section panel" style="margin-top: 25px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; padding-bottom: 15px;">
-                <h2 style="border: none; margin: 0; padding: 0;">Historial de Gastos</h2>
-                <button onclick="window.location.href='historial.html'" class="btn-primario" style="padding: 8px 15px; font-size: 0.85em;">
+            
+            <div class="historial-header">
+                <h2>Historial de Gastos</h2>
+                
+                <!-- Agrupamos los controles a la derecha -->
+                <div class="historial-controles">
+                    <div class="filtro-grupo">
+                        <label for="filtro-categoria">Categoría:</label>
+                        <select id="filtro-categoria">
+                            <option value="TODAS">Todas las categorías</option>
+                            <option value="Comida">Comida / Despensa</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Servicios">Servicios</option>
+                            <option value="Entretenimiento">Entretenimiento</option>
+                            <option value="Otros">Otros</option>
+                        </select>
+                    </div>
+                    
+                    <button onclick="window.location.href='historial.html'" class="btn-primario btn-sm">
                         Historial Completo
-                </button>
-                
-                
-                <!-- Filtro Dinámico -->
-                <div>
-                    <label for="filtro-categoria" style="font-size: 0.9em; font-weight: 600; color: var(--text-muted); margin-right: 10px;">Filtrar por Categoría:</label>
-                    <select id="filtro-categoria" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); outline: none;">
-                        <option value="TODAS">Todas las categorías</option>
-                        <option value="Comida">Comida / Despensa</option>
-                        <option value="Transporte">Transporte</option>
-                        <option value="Servicios">Servicios</option>
-                        <option value="Entretenimiento">Entretenimiento</option>
-                        <option value="Otros">Otros</option>
-                    </select>
+                    </button>
                 </div>
             </div>
-            
 
             <div class="table-container" style="max-height: 400px; overflow-y: auto;">
                 <table id="tabla-historial">
@@ -119,7 +121,6 @@
                 </table>
             </div>
         </section>
-
     </main>
 
     <!-- ================= MODALES ================= -->
