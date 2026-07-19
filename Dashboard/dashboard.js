@@ -283,34 +283,80 @@ window.onclick = function(event) {
    ENVÍO DE DATOS AL BACKEND (POST)
 ========================================= */
 
-// 1. Guardar Quincena
+// 1. Guardar Quincenas (Q1 y Q2)
 document.getElementById('form-quincena').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const data = {
-        usuario: { id: usuario.id },
-        salarioQuincenal: parseFloat(document.getElementById('monto-quincena').value),
-        fechaDeposito: document.getElementById('fecha-quincena').value
-    };
+    
+    // Lista de peticiones que enviaremos a Spring Boot
+    const peticiones = [];
 
-    try {
-        const res = await fetch(`${API_URL}/api/finanzas/ingresos/registrar`, {
+    // --- Procesar Quincena 1 ---
+    const montoQ1 = document.getElementById('monto-q1').value;
+    const fechaQ1 = document.getElementById('fecha-q1').value;
+    const idQ1 = document.getElementById('id-q1').value;
+
+    if (montoQ1 && fechaQ1) {
+        const dataQ1 = {
+            usuario: { id: usuario.id },
+            salarioQuincenal: parseFloat(montoQ1),
+            fechaDeposito: fechaQ1
+        };
+        // Si ya tiene un ID (se está modificando), lo agregamos para que el backend actualice
+        if (idQ1) dataQ1.id = parseInt(idQ1); 
+
+        peticiones.push(fetch(`${API_URL}/api/finanzas/ingresos/registrar`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
+            body: JSON.stringify(dataQ1)
+        }));
+    }
 
-        if (res.ok) {
-            alert("Quincena registrada exitosamente");
-            modalQuincena.style.display = "none";
-            document.getElementById('form-quincena').reset();
-            cargarDatosDashboard(); 
-        } else {
-            // AQUÍ ATRAPAMOS EL ERROR DE SPRING BOOT
-            const errorMsg = await res.text();
-            alert("⚠️ " + errorMsg);
+    // --- Procesar Quincena 2 ---
+    const montoQ2 = document.getElementById('monto-q2').value;
+    const fechaQ2 = document.getElementById('fecha-q2').value;
+    const idQ2 = document.getElementById('id-q2').value;
+
+    // Solo se envía si el usuario llenó los datos de la segunda quincena
+    if (montoQ2 && fechaQ2) {
+        const dataQ2 = {
+            usuario: { id: usuario.id },
+            salarioQuincenal: parseFloat(montoQ2),
+            fechaDeposito: fechaQ2
+        };
+        if (idQ2) dataQ2.id = parseInt(idQ2);
+
+        peticiones.push(fetch(`${API_URL}/api/finanzas/ingresos/registrar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataQ2)
+        }));
+    }
+
+    try {
+        // Ejecutamos ambas peticiones al mismo tiempo
+        const respuestas = await Promise.all(peticiones);
+        
+        // Verificamos si Spring Boot rechazó alguna (ej. por intentar alterar un mes pasado)
+        let huboError = false;
+        let mensajesError = "";
+        
+        for (let res of respuestas) {
+            if (!res.ok) {
+                huboError = true;
+                mensajesError += await res.text() + "\n";
+            }
         }
+
+        if (huboError) {
+            alert("⚠️ Atención:\n" + mensajesError);
+        } else {
+            alert("Ingresos del mes guardados exitosamente.");
+            document.getElementById('modal-quincena').style.display = "none";
+            cargarDatosDashboard(); // Recargar gráficos y widgets
+        }
+
     } catch (error) {
-        console.error("Error al registrar quincena:", error);
+        console.error("Error al registrar quincenas:", error);
         alert("Hubo un problema de conexión.");
     }
 });
