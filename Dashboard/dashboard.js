@@ -236,11 +236,6 @@ document.getElementById('es-msi').addEventListener('change', function() {
 
 // Función para abrir modales
 document.getElementById('btn-nueva-quincena').onclick = () => {
-    // Si el botón dice que está bloqueado, no abrimos el modal y lanzamos alerta
-    if (document.getElementById('btn-nueva-quincena').textContent.includes('🔒')) {
-        alert("Ya tienes registradas tus 2 quincenas de este mes. Deberás esperar al próximo mes para registrar más.");
-        return;
-    }
     modalQuincena.style.display = "block";
 };
 
