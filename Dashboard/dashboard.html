@@ -124,21 +124,39 @@
 
     <!-- ================= MODALES ================= -->
     
-    <!-- Modal: Agregar Quincena -->
+    <!-- Modal: Gestionar Quincenas del Mes -->
     <div id="modal-quincena" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
             <span class="close-btn" id="close-quincena">&times;</span>
-            <h2>Registrar Quincena</h2>
+            <h2>Ingresos del Mes</h2>
+            <p style="color: var(--text-muted); font-size: 0.9em; margin-bottom: 20px;">Registra o modifica tus dos quincenas correspondientes al mes actual.</p>
+            
             <form id="form-quincena">
+                <!-- ================= QUINCENA 1 ================= -->
+                <h3 style="color: var(--accent-color); font-size: 1.1em; margin-bottom: 15px;">Primera Quincena</h3>
+                <input type="hidden" id="id-q1"> <!-- Aquí guardaremos el ID invisible para poder modificar -->
                 <div class="input-group">
-                    <label>Salario Quincenal</label>
-                    <input type="number" step="0.01" id="monto-quincena" required placeholder="Ej. 5000.00">
+                    <label>Monto</label>
+                    <input type="number" step="0.01" id="monto-q1" required placeholder="Ej. 4500.00">
                 </div>
                 <div class="input-group">
                     <label>Fecha de Depósito</label>
-                    <input type="date" id="fecha-quincena" required>
+                    <input type="date" id="fecha-q1" required>
                 </div>
-                <button type="submit">Guardar Ingreso</button>
+
+                <!-- ================= QUINCENA 2 ================= -->
+                <h3 style="color: var(--accent-color); font-size: 1.1em; margin-bottom: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">Segunda Quincena (Opcional)</h3>
+                <input type="hidden" id="id-q2">
+                <div class="input-group">
+                    <label>Monto</label>
+                    <input type="number" step="0.01" id="monto-q2" placeholder="Ej. 4500.00">
+                </div>
+                <div class="input-group">
+                    <label>Fecha de Depósito</label>
+                    <input type="date" id="fecha-q2">
+                </div>
+
+                <button type="submit" style="margin-top: 20px;">Guardar Ingresos</button>
             </form>
         </div>
     </div>

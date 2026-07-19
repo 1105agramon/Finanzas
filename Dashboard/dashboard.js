@@ -60,28 +60,43 @@ async function cargarDatosDashboard() {
         const mesActual = hoy.getMonth();
         const anioActual = hoy.getFullYear();
 
-        // 1. Filtramos las quincenas que pertenecen estrictamente a este mes
-        const quincenasDelMes = ingresos.filter(ing => {
-            const fechaIng = new Date(ing.fechaDeposito + 'T00:00:00');
-            return fechaIng.getMonth() === mesActual && fechaIng.getFullYear() === anioActual;
-        });
+        // 1. Filtramos las quincenas que pertenecen estrictamente a este mes y las ordenamos por fecha
+        const quincenasDelMes = ingresos
+            .filter(ing => {
+                const fechaIng = new Date(ing.fechaDeposito + 'T00:00:00');
+                return fechaIng.getMonth() === mesActual && fechaIng.getFullYear() === anioActual;
+            })
+            .sort((a, b) => new Date(a.fechaDeposito) - new Date(b.fechaDeposito)); // Ordenar por fecha
 
-        // 2. Controlamos el botón según el límite de 2 quincenas
+        // 2. Controlamos el botón (Siempre estará activo para modificar el mes en curso)
         const btnQuincena = document.getElementById('btn-nueva-quincena');
-        if (quincenasDelMes.length === 0) {
-            btnQuincena.textContent = '+ Registrar 1ra Quincena';
-            btnQuincena.style.backgroundColor = 'var(--accent-color)';
-        } else if (quincenasDelMes.length === 1) {
-            btnQuincena.textContent = '+ Registrar 2da Quincena';
-            btnQuincena.style.backgroundColor = 'var(--accent-color)';
-        } else {
-            btnQuincena.textContent = '🔒 Mes Completado (2/2)';
-            btnQuincena.style.backgroundColor = 'var(--text-muted)'; // Se pone gris
+        btnQuincena.textContent = '✎ Gestionar Quincenas';
+        btnQuincena.style.backgroundColor = 'var(--accent-color)';
+        if (btnQuincena.classList.contains('btn-bloqueado')) {
+            btnQuincena.classList.remove('btn-bloqueado');
         }
 
-        // Limpiamos los inputs del modal para que entren limpios
-        document.getElementById('monto-quincena').value = '';
-        document.getElementById('fecha-quincena').value = hoy.toISOString().split('T')[0];
+        // 3. Limpiamos los inputs del modal por defecto
+        document.getElementById('id-q1').value = '';
+        document.getElementById('monto-q1').value = '';
+        document.getElementById('fecha-q1').value = '';
+        
+        document.getElementById('id-q2').value = '';
+        document.getElementById('monto-q2').value = '';
+        document.getElementById('fecha-q2').value = '';
+
+        // 4. Si ya hay datos en la base de datos para este mes, prellenamos el formulario
+        if (quincenasDelMes.length > 0) {
+            document.getElementById('id-q1').value = quincenasDelMes[0].id;
+            document.getElementById('monto-q1').value = quincenasDelMes[0].salarioQuincenal;
+            document.getElementById('fecha-q1').value = quincenasDelMes[0].fechaDeposito;
+        }
+        
+        if (quincenasDelMes.length > 1) {
+            document.getElementById('id-q2').value = quincenasDelMes[1].id;
+            document.getElementById('monto-q2').value = quincenasDelMes[1].salarioQuincenal;
+            document.getElementById('fecha-q2').value = quincenasDelMes[1].fechaDeposito;
+        }
 
         // ==========================================
         // 5. Cálculos Matemáticos del Mes Actual

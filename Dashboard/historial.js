@@ -1,5 +1,6 @@
 const API_URL = 'https://finanzas.juangranados.org';
 let todosLosGastos = [];
+let todosLosIngresos = [];
 let graficaMensual = null;
 
 // 1. Verificación de Seguridad
@@ -20,25 +21,29 @@ document.getElementById('filtro-anio').addEventListener('change', (e) => {
 
 async function cargarTodoElHistorial() {
     try {
-        const res = await fetch(`${API_URL}/api/gastos/usuario/${usuario.id}`, { cache: 'no-store' });
-        todosLosGastos = await res.json();
+        // Pedimos ingresos y gastos al mismo tiempo
+        const [resGastos, resIngresos] = await Promise.all([
+            fetch(`${API_URL}/api/gastos/usuario/${usuario.id}`, { cache: 'no-store' }),
+            fetch(`${API_URL}/api/finanzas/ingresos/usuario/${usuario.id}`, { cache: 'no-store' })
+        ]);
+        
+        todosLosGastos = await resGastos.json();
+        todosLosIngresos = await resIngresos.json();
 
-        // Extraer los años únicos de todos los gastos para llenar el <select>
+        // Extraer los años únicos donde haya ingresos o gastos
         const aniosDisponibles = new Set();
-        todosLosGastos.forEach(gasto => {
-            const anio = gasto.fechaCompra.split('-')[0]; // Extrae el "2026" de "2026-07-14"
-            aniosDisponibles.add(anio);
-        });
+        todosLosGastos.forEach(g => aniosDisponibles.add(g.fechaCompra.split('-')[0]));
+        todosLosIngresos.forEach(i => aniosDisponibles.add(i.fechaDeposito.split('-')[0]));
 
         // Llenar el selector de años
         const selectAnio = document.getElementById('filtro-anio');
-        selectAnio.innerHTML = ''; // Limpiar
+        selectAnio.innerHTML = ''; 
         
-        // Convertir el Set a Array y ordenarlo de mayor a menor (años recientes primero)
         const aniosOrdenados = Array.from(aniosDisponibles).sort((a, b) => b - a);
         
         if (aniosOrdenados.length === 0) {
-            selectAnio.innerHTML = '<option value="">No hay gastos registrados</option>';
+            selectAnio.innerHTML = '<option value="">No hay registros</option>';
+            document.getElementById('historial-completo-body').innerHTML = '<tr><td colspan="4" style="text-align: center;">Sin datos.</td></tr>';
             return;
         }
 
@@ -51,60 +56,78 @@ async function cargarTodoElHistorial() {
 
     } catch (error) {
         console.error("Error al cargar el historial:", error);
+        document.getElementById('historial-completo-body').innerHTML = '<tr><td colspan="4" style="text-align: center;">Error al cargar datos.</td></tr>';
     }
 }
 
 function procesarDatosPorAnio(anioSeleccionado) {
-    // 1. Filtrar solo los gastos que pertenecen al año seleccionado
-    const gastosDelAnio = todosLosGastos.filter(gasto => gasto.fechaCompra.startsWith(anioSeleccionado));
+    // 1. Filtrar los datos del año seleccionado
+    const gastosDelAnio = todosLosGastos.filter(g => g.fechaCompra.startsWith(anioSeleccionado));
+    const ingresosDelAnio = todosLosIngresos.filter(i => i.fechaDeposito.startsWith(anioSeleccionado));
 
-    // 2. Ordenar por fecha de forma descendente (más recientes arriba)
-    gastosDelAnio.sort((a, b) => new Date(b.fechaCompra) - new Date(a.fechaCompra));
+    // 2. Variables para los totales y los 12 meses
+    let totalGastosAnual = 0;
+    let totalIngresosAnual = 0;
+    
+    // Arrays de 12 posiciones (Enero a Diciembre) inicializados en 0
+    let gastosPorMes = new Array(12).fill(0);
+    let ingresosPorMes = new Array(12).fill(0); 
 
-    // 3. Variables para la gráfica y totales
-    let totalAnual = 0;
-    // Array de 12 posiciones (Enero a Diciembre) inicializado en 0
-    let sumasPorMes = new Array(12).fill(0); 
-
-    const tbody = document.getElementById('historial-completo-body');
-    tbody.innerHTML = '';
-
-    // 4. Recorrer los gastos del año para llenar la tabla y sumar por meses
+    // 3. Sumar Gastos
     gastosDelAnio.forEach(gasto => {
-        // Sumar al total anual
-        totalAnual += gasto.montoTotal;
-
-        // Extraer el mes del gasto (Formato YYYY-MM-DD)
-        // Restamos 1 porque los arrays empiezan en 0 (Enero = 0, Febrero = 1...)
+        totalGastosAnual += gasto.montoTotal;
         const mesIndex = parseInt(gasto.fechaCompra.split('-')[1]) - 1;
-        sumasPorMes[mesIndex] += gasto.montoTotal;
-
-        // Crear fila para la tabla
-        const fechaObj = new Date(gasto.fechaCompra + 'T00:00:00');
-        const fechaStr = fechaObj.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
-        
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td style="font-weight: 600;">${fechaStr}</td>
-            <td>${gasto.concepto}</td>
-            <td>${gasto.categoria}</td>
-            <td style="color: var(--error-color); font-weight: bold;">${formatearMoneda(gasto.montoTotal)}</td>
-        `;
-        tbody.appendChild(tr);
+        gastosPorMes[mesIndex] += gasto.montoTotal;
     });
 
-    if (gastosDelAnio.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay gastos en este año.</td></tr>';
+    // 4. Sumar Ingresos
+    ingresosDelAnio.forEach(ingreso => {
+        totalIngresosAnual += ingreso.salarioQuincenal;
+        const mesIndex = parseInt(ingreso.fechaDeposito.split('-')[1]) - 1;
+        ingresosPorMes[mesIndex] += ingreso.salarioQuincenal;
+    });
+
+    // 5. Actualizar los Widgets superiores
+    document.getElementById('total-anio-gastos').textContent = formatearMoneda(totalGastosAnual);
+    document.getElementById('total-anio-ingresos').textContent = formatearMoneda(totalIngresosAnual);
+
+    // 6. Llenar la Tabla Resumen
+    const tbody = document.getElementById('historial-completo-body');
+    tbody.innerHTML = '';
+    
+    const nombresMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    let hayDatos = false;
+
+    // Recorremos los 12 meses para pintar las filas
+    for (let i = 0; i < 12; i++) {
+        // Solo mostramos los meses que tuvieron algún movimiento de entrada o salida
+        if (ingresosPorMes[i] > 0 || gastosPorMes[i] > 0) {
+            hayDatos = true;
+            
+            // Calculamos el Balance del mes
+            const balance = ingresosPorMes[i] - gastosPorMes[i];
+            const colorBalance = balance >= 0 ? 'var(--success-color)' : 'var(--error-color)';
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight: 600;">${nombresMeses[i]}</td>
+                <td style="color: var(--success-color); font-weight: bold;">${formatearMoneda(ingresosPorMes[i])}</td>
+                <td style="color: var(--error-color); font-weight: bold;">${formatearMoneda(gastosPorMes[i])}</td>
+                <td style="color: ${colorBalance}; font-weight: bold;">${formatearMoneda(balance)}</td>
+            `;
+            tbody.appendChild(tr);
+        }
     }
 
-    // 5. Actualizar el widget de Total Anual
-    document.getElementById('total-anio').textContent = formatearMoneda(totalAnual);
+    if (!hayDatos) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay movimientos en este año.</td></tr>';
+    }
 
-    // 6. Dibujar la gráfica con las sumas de cada mes
-    dibujarGraficaMensual(sumasPorMes, anioSeleccionado);
+    // 7. Dibujar la gráfica comparativa doble
+    dibujarGraficaMensual(ingresosPorMes, gastosPorMes, anioSeleccionado);
 }
 
-function dibujarGraficaMensual(datosMeses, anio) {
+function dibujarGraficaMensual(datosIngresos, datosGastos, anio) {
     const ctx = document.getElementById('graficaAnual').getContext('2d');
     
     if (graficaMensual) {
@@ -117,13 +140,22 @@ function dibujarGraficaMensual(datosMeses, anio) {
         type: 'bar',
         data: {
             labels: nombresMeses,
-            datasets: [{
-                label: `Gastos Totales ${anio}`,
-                data: datosMeses,
-                backgroundColor: '#ef4444', // Rojo para gastos
-                borderRadius: 4,
-                maxBarThickness: 35
-            }]
+            datasets: [
+                {
+                    label: `Ingresos ${anio}`,
+                    data: datosIngresos,
+                    backgroundColor: '#10b981', // Verde
+                    borderRadius: 4,
+                    maxBarThickness: 25
+                },
+                {
+                    label: `Gastos ${anio}`,
+                    data: datosGastos,
+                    backgroundColor: '#ef4444', // Rojo
+                    borderRadius: 4,
+                    maxBarThickness: 25
+                }
+            ]
         },
         options: {
             responsive: true,
@@ -142,7 +174,7 @@ function dibujarGraficaMensual(datosMeses, anio) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return 'Total: ' + formatearMoneda(context.raw);
+                            return context.dataset.label + ': ' + formatearMoneda(context.raw);
                         }
                     }
                 }
