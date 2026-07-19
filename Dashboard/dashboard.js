@@ -32,6 +32,7 @@ document.getElementById('btn-logout').addEventListener('click', () => {
     window.location.href = '../index.html';
 });
 
+
 // 4. Función Principal para traer los datos
 async function cargarDatosDashboard() {
     try {
@@ -53,51 +54,63 @@ async function cargarDatosDashboard() {
 
 
         // ==========================================
-        // LÓGICA INTELIGENTE: ¿Ya existe una quincena?
+        // LÓGICA INTELIGENTE: QUINCENAS DEL MES ACTUAL
         // ==========================================
-        if (ingresos.length > 0) {
-            // Cambiamos el texto del botón principal
-            document.getElementById('btn-nueva-quincena').textContent = '✎ Modificar Quincena';
-            
-            // Pre-llenamos los inputs del modal oculto para que veas tu salario actual
-            document.getElementById('monto-quincena').value = ingresos[0].salarioQuincenal;
-            document.getElementById('fecha-quincena').value = ingresos[0].fechaDeposito;
-        }
-        // ==========================================
+        const hoy = new Date();
+        const mesActual = hoy.getMonth();
+        const anioActual = hoy.getFullYear();
 
-        // 5. Cálculos Matemáticos para los Widgets y Gráfica
+        // 1. Filtramos las quincenas que pertenecen estrictamente a este mes
+        const quincenasDelMes = ingresos.filter(ing => {
+            const fechaIng = new Date(ing.fechaDeposito + 'T00:00:00');
+            return fechaIng.getMonth() === mesActual && fechaIng.getFullYear() === anioActual;
+        });
+
+        // 2. Controlamos el botón según el límite de 2 quincenas
+        const btnQuincena = document.getElementById('btn-nueva-quincena');
+        if (quincenasDelMes.length === 0) {
+            btnQuincena.textContent = '+ Registrar 1ra Quincena';
+            btnQuincena.style.backgroundColor = 'var(--accent-color)';
+        } else if (quincenasDelMes.length === 1) {
+            btnQuincena.textContent = '+ Registrar 2da Quincena';
+            btnQuincena.style.backgroundColor = 'var(--accent-color)';
+        } else {
+            btnQuincena.textContent = '🔒 Mes Completado (2/2)';
+            btnQuincena.style.backgroundColor = 'var(--text-muted)'; // Se pone gris
+        }
+
+        // Limpiamos los inputs del modal para que entren limpios
+        document.getElementById('monto-quincena').value = '';
+        document.getElementById('fecha-quincena').value = hoy.toISOString().split('T')[0];
+
+        // ==========================================
+        // 5. Cálculos Matemáticos del Mes Actual
+        // ==========================================
         
-        let totalIngresos = 0;
-        let totalGastos = 0;
+        // Sumamos TODAS las quincenas que haya en este mes
+        let totalIngresos = quincenasDelMes.reduce((acc, current) => acc + current.salarioQuincenal, 0);
 
-        if (ingresos.length > 0) {
-            // Tomamos el ingreso más reciente (suponiendo que es el primero)
-            const ultimaQuincena = ingresos[0];
-            totalIngresos = ultimaQuincena.salarioQuincenal;
+        // Filtramos SOLO los gastos que se hicieron EN ESTE MES
+        const gastosDelMes = gastos.filter(gasto => {
+            const fechaGasto = new Date(gasto.fechaCompra + 'T00:00:00');
+            return fechaGasto.getMonth() === mesActual && fechaGasto.getFullYear() === anioActual;
+        });
 
-            // Filtramos SOLO los gastos que se hicieron desde esa fecha en adelante
-            const fechaCorte = new Date(ultimaQuincena.fechaDeposito + 'T00:00:00');
-            
-            const gastosRecientes = gastos.filter(gasto => {
-                const fechaGasto = new Date(gasto.fechaCompra + 'T00:00:00');
-                return fechaGasto >= fechaCorte; // ¿El gasto es igual o posterior a mi quincena?
-            });
+        // Sumamos los gastos de este mes
+        let totalGastos = gastosDelMes.reduce((acc, current) => acc + current.montoTotal, 0);
 
-            // Sumamos solo los gastos de la quincena actual
-            totalGastos = gastosRecientes.reduce((acc, current) => acc + current.montoTotal, 0);
-        }
-
-        // Actualizar el HTML de los widgets (El historial seguirá mostrando todo, pero el widget solo lo de hoy)
+        // Actualizar el HTML de los widgets
         document.getElementById('widget-salario').textContent = formatearMoneda(totalIngresos);
         document.getElementById('widget-gastado').textContent = formatearMoneda(totalGastos);
         document.getElementById('widget-tarjetas').textContent = tarjetas.length;
-        // 6. Generar la Gráfica
+
+        // 6. Generar la Gráfica con los datos ya filtrados de este mes
         dibujarGrafica(totalIngresos, totalGastos);
 
         // 7. Llenar la Tabla de MSI
         llenarTablaMsi(msiPendientes);
 
-        // 8. Llenar el Historial de Gastos
+        // 8. Llenar el Historial de Gastos (Esta sí muestra el global, para que tengas registro)
         llenarTablaHistorial(gastosGlobales);
 
     } catch (error) {
@@ -207,7 +220,15 @@ document.getElementById('es-msi').addEventListener('change', function() {
 });
 
 // Función para abrir modales
-document.getElementById('btn-nueva-quincena').onclick = () => modalQuincena.style.display = "block";
+document.getElementById('btn-nueva-quincena').onclick = () => {
+    // Si el botón dice que está bloqueado, no abrimos el modal y lanzamos alerta
+    if (document.getElementById('btn-nueva-quincena').textContent.includes('🔒')) {
+        alert("Ya tienes registradas tus 2 quincenas de este mes. Deberás esperar al próximo mes para registrar más.");
+        return;
+    }
+    modalQuincena.style.display = "block";
+};
+
 document.getElementById('btn-nueva-tarjeta').onclick = () => modalTarjeta.style.display = "block";
 document.getElementById('btn-nuevo-gasto').onclick = async () => {
     modalGasto.style.display = "block";
@@ -251,22 +272,31 @@ window.onclick = function(event) {
 document.getElementById('form-quincena').addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = {
-        usuario: { id: usuario.id }, // Spring Boot necesita saber de quién es
+        usuario: { id: usuario.id },
         salarioQuincenal: parseFloat(document.getElementById('monto-quincena').value),
         fechaDeposito: document.getElementById('fecha-quincena').value
     };
 
-    const res = await fetch(`${API_URL}/api/finanzas/ingresos/registrar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
+    try {
+        const res = await fetch(`${API_URL}/api/finanzas/ingresos/registrar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
 
-    if (res.ok) {
-        alert("Quincena registrada exitosamente");
-        modalQuincena.style.display = "none";
-        // Ya no reseteamos el formulario aquí para mantener los datos visibles en la próxima apertura
-        cargarDatosDashboard(); // Recargar gráficas
+        if (res.ok) {
+            alert("Quincena registrada exitosamente");
+            modalQuincena.style.display = "none";
+            document.getElementById('form-quincena').reset();
+            cargarDatosDashboard(); 
+        } else {
+            // AQUÍ ATRAPAMOS EL ERROR DE SPRING BOOT
+            const errorMsg = await res.text();
+            alert("⚠️ " + errorMsg);
+        }
+    } catch (error) {
+        console.error("Error al registrar quincena:", error);
+        alert("Hubo un problema de conexión.");
     }
 });
 
